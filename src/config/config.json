@@ -1,0 +1,87 @@
+{
+    "development": {
+        "config_id": "development",
+        "node_port": 9800,
+        "secure_node_port":9801,
+        "customerTable": "dataTable",
+        "application_base_url":"https://redhat.ameyo.net:8443",
+        "connectionProps" : {
+            "user": "postgres",
+            "host": "127.0.0.1",
+            "database": "ameyodb",
+            "password": "",
+            "port": 5432
+        },
+        "CMHeaders":{
+            "Content-Type": "application/json",
+            "hash-key": "fecace70bf6ea0c450c5b2071cbabc9",
+            "host": "amishra.ameyo.com",
+            "policy-name": "token-based-authorization-policy",
+            "requesting-host": "amishra.ameyo.com"
+        }
+    },
+    "testing": {
+        "config_id": "testing",
+        "node_port": 9800,
+        "secure_node_port":9801,
+        "customerTable": "dataTable",
+        "application_base_url":"https://redhat.ameyo.net:8443",
+        "connectionProps" : {
+            "user": "postgres",
+            "host": "10.10.2.22",
+            "database": "ameyodb",
+            "password": "",
+            "port": 5432
+        },
+        "CMHeaders":{
+            "Content-Type": "application/json",
+            "hash-key": "fecace70bf6ea0c450c5b2071cbabc9",
+            "host": "amishra.ameyo.com",
+            "policy-name": "token-based-authorization-policy",
+            "requesting-host": "amishra.ameyo.com"
+        }
+    },
+    "staging": {
+        "config_id": "staging",
+        "node_port": 9800,
+        "secure_node_port":9801,
+        "customerTable": "dataTable",
+        "application_base_url":"https://redhat.ameyo.net:8443",
+        "connectionProps" : {
+            "user": "postgres",
+            "host": "10.10.2.22",
+            "database": "ameyodb",
+            "password": "",
+            "port": 5432
+        },
+        "CMHeaders":{
+            "Content-Type": "application/json",
+            "hash-key": "fecace70bf6ea0c450c5b2071cbabc9",
+            "host": "amishra.ameyo.com",
+            "policy-name": "token-based-authorization-policy",
+            "requesting-host": "amishra.ameyo.com"
+        }
+    },
+    "production": {
+        "config_id": "production",
+        "node_port": 9800,
+        "secure_node_port":9801,
+        "customerTable": "dataTable",
+        "application_base_url":"https://redhat.ameyo.net:8443",
+        "connectionProps" : {
+            "user": "postgres",
+            "host": "10.10.2.22",
+            "database": "ameyodb",
+            "password": "",
+            "port": 5432
+        },
+        "CMHeaders":{
+            "Content-Type": "application/json",
+            "hash-key": "fecace70bf6ea0c450c5b2071cbabc9",
+            "host": "amishra.ameyo.com",
+            "policy-name": "token-based-authorization-policy",
+            "requesting-host": "amishra.ameyo.com"
+        }
+    }
+}
+

@@ -450,42 +450,278 @@ export const updateSetting = async (req, res) => {
 
 
 
-
 //-------- dt replica needed ---------------------------------------
 export const updateSetting_dt = async (req, res) => {
 
-    // Will need a third action button 'Download' that would provide the list of all contacts in the this.tag_code and upon recieving 
-    // it will get the list of all the customers for this.tag_code and drop all those customers then will reUpload the list of new customers in the list
+    /*
+        Request URL: https://redhat.ameyo.net:9801/setting/3
+        Request Method: PUT
+        Status Code: 200 OK
+
+        {
+            "id": 179,
+            "campaign_id": 10,
+            "tag": "Personal Loan",
+            "tag_code": 3,
+            "msg_type": "dynamic",
+            "prompt_name": "Message1",
+            "start_date": "2014-08-30 00:00:00",
+            "end_date": "2014-08-31 00:00:00",
+            "is_enabled": false,
+            "priority": "2",
+            "frequency": "always",
+            "contacts":
+            [
+                {"phone1":"78387353","phone2":"7838733336","phone3":"347347737","cif_no":"767654563512"},
+                {"phone1":"78387354","phone2":"7838733336","phone3":"347347737","cif_no":"767654563513"},
+                {"phone1":"78387355","phone2":"7838733336","phone3":"347347737","cif_no":"767654563514"},
+                {"phone1":"78387356","phone2":"7838733336","phone3":"347347737","cif_no":"767654563515"},
+                {"phone1":"78387357","phone2":"7838733336","phone3":"347347737","cif_no":"767654563516"},
+                {"phone1":"78387358","phone2":"7838733336","phone3":"347347737","cif_no":"767654563517"},
+                {"phone1":"78387354","phone2":"7838733336","phone3":"347347737","cif_no":"767654563518"},
+                {"phone1":"78387355","phone2":"7838733336","phone3":"347347737","cif_no":"767654563519"},
+                {"phone1":"78387356","phone2":"7838733336","phone3":"347347737","cif_no":"767654563520"},
+                {"phone1":"78387357","phone2":"7838733336","phone3":"347347737","cif_no":"767654563521"},
+                {"phone1":"78387358","phone2":"7838733336","phone3":"347347737","cif_no":"767654563522"},
+                {"phone1":""}
+            ]
+        }
+    */
+
+    // Remove all the customer in current setting; 
+
     const client = new Client(global.gConfig.connectionProps)
-    client.connect();
+    client.connect()
 
-    let data = req.body;
+    let sqlQuery = '';
+    let SQLresult = {};
+    var tag_code;
+    var campaign_id;
+    var defaultLeadId;
+
+    sqlQuery = `SELECT * FROM custom_functional_message_module_settings where id=${req.params.settingId}`;
+    console.log(sqlQuery);
+    try {
+        SQLresult = await client.query(sqlQuery);
+        tag_code = SQLresult.rows[0].tag_code;
+        campaign_id = SQLresult.rows[0].campaign_id;
+        defaultLeadId = await getDefaultLeadId(campaign_id);
+
+        let customerAndCallbackRecords = [];
+        try {
+
+            let dataTableName = await getDataTableName(campaign_id);
+            let sqlQuery = `select tag, phone1, segment, cif_no from ${dataTableName} where tag % ${tag_code} = 0`;
+            SQLresult = await client.query(sqlQuery);
+            console.log('SQL Query : ');
+            console.log(sqlQuery);
+            console.log('SQL Result : ');
+            console.log(SQLresult);
+            for (let i = 0; i < SQLresult.rows.length; i++) {
+                let customerRecord = {};
+                let contact = {};
+                contact['phone1'] = SQLresult.rows[i].phone1;
+                contact['segment'] = SQLresult.rows[i].segment;
+                contact['cif_no'] = SQLresult.rows[i].cif_no;
+                contact['tag'] = SQLresult.rows[i].tag / tag_code;
+                customerRecord['customerRecord'] = contact;
+                customerAndCallbackRecords.push(contact);
+                console.log(contact);
+            }
+            console.log("customerAndCallbackRecords : ");
+            console.log(customerAndCallbackRecords);
+
+        } catch (e) {
+            console.error(e.stack)
+        }
+
+
+        try {
+
+
+            // call CM api now;
+            // now contact insertion..
+            //------------------------------------
+            console.log("------------------ Removed Contacts association with current tag, NOW UPDATING THE CONTACTS ---------------------------------");
+
+            let dataForUploadContacts = {
+                "campaignId": Number(campaign_id),
+                "leadId": Number(defaultLeadId),
+                "customerRecords": customerAndCallbackRecords,
+                "properties": {
+                    "update.customer": true,
+                    "migrate.customer": false
+                }
+            }
+
+            console.log(dataForUploadContacts);
+
+            let baseURL = global.gConfig.application_base_url;
+            let CMHeaders = global.gConfig.CMHeaders;
+
+            const getData = async (baseURL, dataForUploadContacts, CMHeaders) => {
+                try {
+
+                    const response = await axios({
+                            method: 'post',
+                            url: `/dacx/jsonCommand`,
+                            baseURL: baseURL,
+                            headers: CMHeaders,
+                            data: {
+                                "command": "remote.processor.voiceCampaignConfigurationService.uploadContacts",
+                                "data": dataForUploadContacts
+                            },
+
+                            httpsAgent: new https.Agent({
+                                rejectUnauthorized: false,
+                                keepAlive: true,
+                                keepAliveMsecs: 50000
+                            }),
+                            httpAgent: new http.Agent({
+                                rejectUnauthorized: false
+                            })
+                        })
+                        .then(function (response) {
+                            console.log(inspect(response.data))
+                            res.json({
+                                msg: "Success",
+                                data: response.data
+                            });
+                        });
+
+                    client.end();
+
+                } catch (error) {
+                    console.log(error);
+                    client.end();
+                }
+            };
+
+            getData(baseURL, dataForUploadContacts, CMHeaders);
+
+
+
+        } catch (e) {
+            console.error(e.stack)
+            res.send({
+                msg: 'Error ',
+                data: 'Error while query postgres'
+            });
+        }
+
+    } catch (e) {
+        console.error(e.stack)
+        res.send({
+            msg: 'Error ',
+            data: 'Error while query postgres'
+        });
+    }
+
+
+    // add new customers in the same settings ( ie for same tag_code);
+    //----------------------------------------------------------------------------------------------------------
+
+    let body = req.body;
     let values = [];
-    let setArray = [];
-    let counter = 0;
-    let currentId = req.params.settingId;
+    let addedCounter = 0;
+    let failedToAddCounter = 0;
+    let dataTableName = await getDataTableName(body.campaign_id);
+    let defaultLeadId = await getDefaultLeadId(body.campaign_id);
+    let customerDataTableName = dataTableName ; // custom_functional_message_module_contacts
+    console.log(customerDataTableName);
 
-    Object.keys(data).forEach( (key, index) => {
-        if(key == 'id') {
-            currentId = data[key];
-        } else if (key == 'tag_code' || key == 'campaign_id' || key == 'tag' ){
-            // do nothing
-        } else {
-            counter++;
-            setArray.push(`${key} = $${counter}`);
-            values.push(data[key]);
+    // now contact insertion..
+    //------------------------------------
+    let contacts = req.body.contacts;
+    console.log(`contacts: ${contacts}`);
+    console.log(contacts);
+    let lengthOfContacts = contacts.length;
+    let customerAndCallbackRecords = [];
+
+    console.log(`length of contacts: ${lengthOfContacts}`);
+
+    Object.keys(contacts).forEach(async (key, index) => {
+        console.log(`contacts at key ${key} : ${contacts[key]}`);
+        let previoustTag = 1;
+        let customerFound = false;
+
+        console.log("-------------------------Quering Customer in the database-------------------");
+        try {
+
+            sqlQuery = `SELECT tag FROM ${customerDataTableName} where cif_no='${contacts[key].cif_no}'`;
+            console.log(`sqlQuery : ${sqlQuery}`);
+
+            SQLresult = await client.query(sqlQuery);
+            
+            console.log(`sqlResut : ${SQLresult.rows}`);
+            if (SQLresult.rows.length > 0) {
+                previoustTag = SQLresult.rows[0].tag;
+                customerFound = true;
+            }
+            contacts[key].tag = tagCode * previoustTag;
+            contacts[key].segment = "1";
+
+            let customerRecord = {};
+            customerRecord['customerRecord'] = contacts[key];
+            customerAndCallbackRecords.push(contacts[key]);
+
+        } catch (e) {
+            console.error(e.stack)
+            res.send({
+                msg: 'Error ',
+                data: e
+            });
+        }
+
+        if(index == lengthOfContacts - 1) {
+
+            let dataForUploadContacts = {
+                "campaignId": Number(body.campaign_id),
+                "leadId": Number(defaultLeadId),
+                "customerRecords": customerAndCallbackRecords,
+                "properties": {
+                    "update.customer": true,
+                    "migrate.customer": false
+                }
+            }
+
+            console.log(dataForUploadContacts);
+            let baseURL =  global.gConfig.application_base_url;
+            let CMHeaders = global.gConfig.CMHeaders; 
+
+            const getData = async (baseURL, dataForUploadContacts, CMHeaders) => {
+                try {
+
+                    const response = await axios({
+                            method: 'post',
+                            url: `/dacx/jsonCommand`,
+                            baseURL:baseURL,
+                            headers: CMHeaders,
+                            data: {
+                                "command": "remote.processor.voiceCampaignConfigurationService.uploadContacts",
+                                "data": dataForUploadContacts
+                            },
+
+                            httpsAgent: new https.Agent({rejectUnauthorized: false, keepAlive: true, keepAliveMsecs: 50000}),
+                            httpAgent: new http.Agent({rejectUnauthorized: false})
+                        })
+                        .then(function (response) {
+                            console.log(inspect(response.data))
+                            res.json({msg:"Success", data: response.data});
+                        });
+
+                    client.end();
+
+                } catch (error) {
+                    console.log(error);
+                    client.end();
+                }
+            };
+
+            getData(baseURL, dataForUploadContacts, CMHeaders);
+
         }
     })
-
-    let sqlQuery = `update custom_functional_message_module_settings set ${setArray.join(', ')} where id = ${currentId}`;
-
-    try{
-        let SQLresult = await client.query(sqlQuery,values);
-        res.json({ msg: 'Success ', data: [] });
-    } catch(e) {
-        console.error(e.stack)
-        res.send({ msg: 'Error ', data: e });
-    }
 
 }
 

@@ -15,6 +15,8 @@ export const getHelper = async (req, res) => {
         sqlQuery = 'select id, context_id as campaign_id, name, file_name from voice_prompts';
         if (id != null)
             sqlQuery = `select id, context_id as campaign_id, name, file_name from voice_prompts where context_id = ${id}`;
+    } else if(helperType == 'campaignContext'){
+	sqlQuery = 'select * from campaign_Context';
     } else
         res.send({
             msg: 'Error ',
@@ -27,6 +29,7 @@ export const getHelper = async (req, res) => {
 
     try {
         let SQLresult = await client.query(sqlQuery, values);
+	console.log(SQLresult);
         res.json({
             msg: 'Success',
             data: SQLresult.rows

@@ -341,7 +341,7 @@ export const addNewSetting_dt = async (req, res) => {
                 customerFound = true;
             }
             contacts[key].tag = tagCode * previoustTag;
-            contacts[key].segment = "1";
+            // contacts[key].segment = "1";
 
             let customerRecord = {};
             customerRecord['customerRecord'] = contacts[key];
@@ -660,7 +660,7 @@ export const updateSetting_dt = async (req, res) => {
                 customerFound = true;
             }
             contacts[key].tag = tagCode * previoustTag;
-            contacts[key].segment = "1";
+            // contacts[key].segment = "1";
 
             let customerRecord = {};
             customerRecord['customerRecord'] = contacts[key];

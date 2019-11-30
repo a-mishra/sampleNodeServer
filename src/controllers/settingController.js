@@ -503,7 +503,6 @@ export const updateSetting_dt = async (req, res) => {
     setArray.push(`prompt_name = '${req.body.prompt_name}'`);
     setArray.push(`start_date = '${req.body.start_date}'`);
     setArray.push(`end_date = '${req.body.end_date}'`);
-    setArray.push(`is_enabled = ${req.body.is_enabled}`);
     setArray.push(`priority = ${req.body.priority}`);
     setArray.push(`frequency = '${req.body.frequency}'`);
 

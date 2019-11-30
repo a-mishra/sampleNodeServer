@@ -499,13 +499,13 @@ export const updateSetting_dt = async (req, res) => {
     var defaultLeadId;
 
     let setArray = [];
-    setArray["msg_type"] = req.body.msg_type;
-    setArray["prompt_name"] = req.body.prompt_name;
-    setArray["start_date"] = req.body.start_date;
-    setArray["end_date"] = req.body.end_date;
-    setArray["is_enabled"] = req.body.is_enabled;
-    setArray["priority"] = req.body.priority;
-    setArray["frequency"] = req.body.frequency;
+    setArray.push(`msg_type = '${req.body.msg_type}'`);
+    setArray.push(`prompt_name = '${req.body.prompt_name}'`);
+    setArray.push(`start_date = '${req.body.start_date}'`);
+    setArray.push(`end_date = '${req.body.end_date}'`);
+    setArray.push(`is_enabled = ${req.body.is_enabled}`);
+    setArray.push(`priority = ${req.body.priority}`);
+    setArray.push(`frequency = '${req.body.frequency}'`);
 
     sqlQuery = `update custom_functional_message_module_settings set ${setArray.join(', ')} where tag = ${req.body.tag_code}`;
 

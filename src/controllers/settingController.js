@@ -509,6 +509,8 @@ export const updateSetting_dt = async (req, res) => {
 
     sqlQuery = `update custom_functional_message_module_settings set ${setArray.join(', ')} where tag_code = ${req.body.tag_code}`;
 
+    console.log(`----> Query for settings update : ${sqlQuery}`);
+
     try {
         SQLresult = await client.query(sqlQuery);
     } catch (e) {

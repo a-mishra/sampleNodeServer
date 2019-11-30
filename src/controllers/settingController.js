@@ -499,11 +499,12 @@ export const updateSetting_dt = async (req, res) => {
     var campaign_id;
     var defaultLeadId;
 
-    sqlQuery = `SELECT * FROM custom_functional_message_module_settings where id=${req.params.settingId}`;
-    console.log(sqlQuery);
+    // sqlQuery = `SELECT * FROM custom_functional_message_module_settings where id=${req.params.settingId}`;
+    // console.log(sqlQuery);
     try {
-        SQLresult = await client.query(sqlQuery);
-        tag_code = SQLresult.rows[0].tag_code;
+        // SQLresult = await client.query(sqlQuery);
+        // tag_code = SQLresult.rows[0].tag_code;
+        tag_code = req.body.tag_code;
         campaign_id = SQLresult.rows[0].campaign_id;
         defaultLeadId = await getDefaultLeadId(campaign_id);
 

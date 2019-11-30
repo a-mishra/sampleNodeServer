@@ -659,7 +659,7 @@ export const updateSetting_dt = async (req, res) => {
                 previoustTag = SQLresult.rows[0].tag;
                 customerFound = true;
             }
-            contacts[key].tag = tagCode * previoustTag;
+            contacts[key].tag = tag_code * previoustTag;
             // contacts[key].segment = "1";
 
             let customerRecord = {};

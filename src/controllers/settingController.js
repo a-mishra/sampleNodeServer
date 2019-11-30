@@ -482,8 +482,7 @@ export const updateSetting_dt = async (req, res) => {
                 {"phone1":"78387355","phone2":"7838733336","phone3":"347347737","cif_no":"767654563519"},
                 {"phone1":"78387356","phone2":"7838733336","phone3":"347347737","cif_no":"767654563520"},
                 {"phone1":"78387357","phone2":"7838733336","phone3":"347347737","cif_no":"767654563521"},
-                {"phone1":"78387358","phone2":"7838733336","phone3":"347347737","cif_no":"767654563522"},
-                {"phone1":""}
+                {"phone1":"78387358","phone2":"7838733336","phone3":"347347737","cif_no":"767654563522"}
             ]
         }
     */
@@ -514,10 +513,10 @@ export const updateSetting_dt = async (req, res) => {
             let dataTableName = await getDataTableName(campaign_id);
             let sqlQuery = `select tag, phone1, segment, cif_no from ${dataTableName} where tag % ${tag_code} = 0`;
             SQLresult = await client.query(sqlQuery);
-            console.log('SQL Query : ');
+            console.log('---> SQL Query : ');
             console.log(sqlQuery);
-            console.log('SQL Result : ');
-            console.log(SQLresult);
+            console.log('---> SQL Result : ');
+            console.log(SQLresult.rows);
             for (let i = 0; i < SQLresult.rows.length; i++) {
                 let customerRecord = {};
                 let contact = {};
@@ -529,7 +528,7 @@ export const updateSetting_dt = async (req, res) => {
                 customerAndCallbackRecords.push(contact);
                 console.log(contact);
             }
-            console.log("customerAndCallbackRecords : ");
+            console.log("===> customerAndCallbackRecords : ");
             console.log(customerAndCallbackRecords);
 
         } catch (e) {
@@ -543,7 +542,6 @@ export const updateSetting_dt = async (req, res) => {
             // call CM api now;
             // now contact insertion..
             //------------------------------------
-            console.log("------------------ Removed Contacts association with current tag, NOW UPDATING THE CONTACTS ---------------------------------");
 
             let dataForUploadContacts = {
                 "campaignId": Number(campaign_id),
@@ -555,7 +553,8 @@ export const updateSetting_dt = async (req, res) => {
                 }
             }
 
-            console.log(dataForUploadContacts);
+            console.log("===> dataForUploadContacts : ");
+            console.log(JSON.stringify(dataForUploadContacts));
 
             let baseURL = global.gConfig.application_base_url;
             let CMHeaders = global.gConfig.CMHeaders;
@@ -598,15 +597,16 @@ export const updateSetting_dt = async (req, res) => {
                 }
             };
 
-            getData(baseURL, dataForUploadContacts, CMHeaders);
+            if(customerAndCallbackRecords != [])
+                getData(baseURL, dataForUploadContacts, CMHeaders);
 
-
+                console.log("------------------ Removed Contacts association with current tag, NOW UPDATING THE CONTACTS ---------------------------------");
 
         } catch (e) {
             console.error(e.stack)
             res.send({
                 msg: 'Error ',
-                data: 'Error while query postgres'
+                data: 'Error while query postgres : Erro while updating details while disassociating the customer with tag, CM API CALL ISSUE'
             });
         }
 
@@ -614,7 +614,7 @@ export const updateSetting_dt = async (req, res) => {
         console.error(e.stack)
         res.send({
             msg: 'Error ',
-            data: 'Error while query postgres'
+            data: 'Error while query postgres, error while deleting data of older tag_code customer'
         });
     }
 

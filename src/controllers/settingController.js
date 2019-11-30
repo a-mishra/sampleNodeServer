@@ -507,7 +507,7 @@ export const updateSetting_dt = async (req, res) => {
     setArray["priority"] = req.body.priority;
     setArray["frequency"] = req.body.frequency;
 
-    sqlQuery = `update custom_functional_message_module_settings set ${setArray.join(', ')} where tag_code = ${req.body.tag_code}`;
+    sqlQuery = `update custom_functional_message_module_settings set ${setArray.join(', ')} where tag = ${req.body.tag_code}`;
 
     console.log(`----> Query for settings update : ${sqlQuery}`);
 

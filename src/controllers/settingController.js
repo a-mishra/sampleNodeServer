@@ -505,7 +505,7 @@ export const updateSetting_dt = async (req, res) => {
         // SQLresult = await client.query(sqlQuery);
         // tag_code = SQLresult.rows[0].tag_code;
         tag_code = req.body.tag_code;
-        campaign_id = SQLresult.rows[0].campaign_id;
+        campaign_id = req.body.campaign_id;
         defaultLeadId = await getDefaultLeadId(campaign_id);
 
         let customerAndCallbackRecords = [];

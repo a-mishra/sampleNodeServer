@@ -10,7 +10,7 @@ export const getHelper = async (req, res) => {
     let values = [];
 
     if (helperType == 'campaignList') {
-        sqlQuery = 'select id, name, type from campaign_context order by name';
+        sqlQuery = 'select id, name, type, process_id from campaign_context order by name';
     } else if (helperType == 'campaignVoicePromptMap') {
         sqlQuery = 'select id, context_id as campaign_id, name, file_name from voice_prompts';
         if (id != null)

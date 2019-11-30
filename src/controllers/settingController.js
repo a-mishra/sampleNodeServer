@@ -628,7 +628,7 @@ export const updateSetting_dt = async (req, res) => {
     let failedToAddCounter = 0;
     let dataTableName = await getDataTableName(body.campaign_id);
     defaultLeadId = await getDefaultLeadId(body.campaign_id);
-    customerDataTableName = dataTableName ; // custom_functional_message_module_contacts
+    let customerDataTableName = dataTableName ; // custom_functional_message_module_contacts
     console.log(customerDataTableName);
 
     // now contact insertion..

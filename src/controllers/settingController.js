@@ -609,11 +609,8 @@ export const updateSetting_dt = async (req, res) => {
                             });
                         });
 
-                    client.end();
-
                 } catch (error) {
                     console.log(error);
-                    client.end();
                 }
             };
 

@@ -64,7 +64,7 @@ export const getContactWithID = (req, res) => {
 }
 
 
-export const getContactWithTagID = (req, res) => {
+export const getContactWithTagID = async (req, res) => {
 
     const client = new Client(global.gConfig.connectionProps)
     client.connect()

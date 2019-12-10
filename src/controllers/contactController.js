@@ -1,11 +1,14 @@
+import axios from 'axios';
+import https from 'https'
+import http from 'http'
+import { inspect } from 'util'
+const config = require('../config/config.js');
+var FormData = require('form-data');
+var fs = require('fs');
+
+//import JSON from 'circular-json'
+
 const { Client } = require('pg')
-const connectionProps = {
-    user: 'postgres',
-    host: '10.10.2.22',
-    database: 'ameyodb',
-    password: '',
-    port: 5432
-};
 
 
 export const getContacts = (req, res) => {

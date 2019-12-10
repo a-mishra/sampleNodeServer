@@ -48,9 +48,9 @@ const settingRoutes = (app) => {
         // delete request
         .delete(global.gConfig.customerTable == 'customTable' ? deleteSetting : deleteSetting_dt);
 
-        app.route('/settingfortag/:tagId')
-        // get Settings For TagCode
-        .get(getSettingWithTagCode);
+    app.route('/settingfortag/:tagId')
+    // get Settings For TagCode
+    .get(getSettingWithTagCode);
 
 }
 

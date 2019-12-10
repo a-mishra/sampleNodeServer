@@ -136,9 +136,40 @@ export const getSettingWithTagCode = async (req, res) => {
             data.push(SQLresult.rows[j]);
     }
 
+    let filteredData = [];
+    for(let i = 0; i < data.length ; i++ ){
+        let startDate = new Date(data[i].start_date);
+        let endDate = new Date(data[i].end_date);
+        let currentDate = Date.now();
+
+        if(data[i].is_enabled = true && endDate > currentDate && startDate < currentDate ) {
+            filteredData.push(data[i]);
+        }
+    }
+    
+    let filteredDataOnlyOneRecordForCampaign = [];
+    for( let i = 0; i < filteredData.length; i++ ){
+        let currentCamapignId = filteredData[i].campaign_id ;
+        let currentPriority = filteredData[i].priority;
+        let isSameRecordFound = false;
+        for( let j = 0 ; j < filteredDataOnlyOneRecordForCampaign.length ; j++ ) {
+            if(filteredDataOnlyOneRecordForCampaign[j].campaign_id == currentCamapignId) {
+                isSameRecordFound = true;
+                if(filteredDataOnlyOneRecordForCampaign[j].priority < currentPriority) {
+                    filteredDataOnlyOneRecordForCampaign[j] = filteredData[i];
+                }
+                break;
+            }
+        }
+        if(isSameRecordFound == false){
+            filteredDataOnlyOneRecordForCampaign.push(filteredData[i]);
+        }
+    }
+
+
     res.json({
         msg: 'Success',
-        data: data
+        data: filteredDataOnlyOneRecordForCampaign
     });
 }
 

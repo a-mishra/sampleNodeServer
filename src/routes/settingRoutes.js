@@ -12,7 +12,9 @@ import {
     deleteSetting_dt
 } from '../controllers/settingController';
 //const config = require('../config/config.js');
-
+import {
+    getSettingForHideUnhide
+} from '../controllers/hideUnhideSettingsController'
 //console.log(global.gConfig);
 
 const settingRoutes = (app) => {
@@ -51,6 +53,10 @@ const settingRoutes = (app) => {
     app.route('/settingfortag/:tagId')
     // get Settings For TagCode
     .get(getSettingWithTagCode);
+
+    app.route('/hideunhidesetting')
+    // get settings for hideunhide module
+    .get(getSettingForHideUnhide);
 
 }
 

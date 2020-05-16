@@ -1,8 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import contactRoutes from './src/routes/contactRoutes';
-import settingRoutes from './src/routes/settingRoutes';
-import helperRoutes from './src/routes/helperRoutes';
+
 
 var fs = require('fs');
 var http = require('http');
@@ -17,6 +16,7 @@ const config = require('./src/config/config.js');
 const app = express();
 const HTTP_PORT = global.gConfig.node_port;
 const HTTPS_PORT = global.gConfig.secure_node_port;
+const bodySizeLimit = global.gConfig.bodySizeLimit;
 
 
 var httpServer = http.createServer(app);
@@ -45,12 +45,11 @@ var httpsServer = https.createServer(credentials, app);
 
 
 // bodyparser setup
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit:bodySizeLimit }));
+app.use(bodyParser.json({ limit:bodySizeLimit }));
 
 contactRoutes(app);
-settingRoutes(app);
-helperRoutes(app);
+
 
 // serving static files
 app.use(express.static('public'));

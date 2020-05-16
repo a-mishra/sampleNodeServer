@@ -3,7 +3,7 @@
         "config_id": "development",
         "node_port": 9800,
         "secure_node_port":9801,
-        "customerTable": "dataTable",
+        "customerTable": "customTable",
         "application_base_url":"https://redhat.ameyo.net:8443",
         "connectionProps" : {
             "user": "postgres",
@@ -18,7 +18,8 @@
             "host": "amishra.ameyo.com",
             "policy-name": "token-based-authorization-policy",
             "requesting-host": "amishra.ameyo.com"
-        }
+        },
+        "bodySizeLimit":"20mb"
     },
     "testing": {
         "config_id": "testing",
@@ -39,7 +40,8 @@
             "host": "amishra.ameyo.com",
             "policy-name": "token-based-authorization-policy",
             "requesting-host": "amishra.ameyo.com"
-        }
+        },
+        "bodySizeLimit":"20mb"
     },
     "staging": {
         "config_id": "staging",
@@ -60,7 +62,8 @@
             "host": "amishra.ameyo.com",
             "policy-name": "token-based-authorization-policy",
             "requesting-host": "amishra.ameyo.com"
-        }
+        },
+        "bodySizeLimit":"20mb"
     },
     "production": {
         "config_id": "production",
@@ -81,7 +84,8 @@
             "host": "amishra.ameyo.com",
             "policy-name": "token-based-authorization-policy",
             "requesting-host": "amishra.ameyo.com"
-        }
+        },
+        "bodySizeLimit":"20mb"
     }
 }
 

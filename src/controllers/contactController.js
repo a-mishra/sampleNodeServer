@@ -1,11 +1,14 @@
+import axios from 'axios';
+import https from 'https'
+import http from 'http'
+import { inspect } from 'util'
+const config = require('../config/config.js');
+var FormData = require('form-data');
+var fs = require('fs');
+
+//import JSON from 'circular-json'
+
 const { Client } = require('pg')
-const connectionProps = {
-    user: 'postgres',
-    host: '10.10.2.22',
-    database: 'ameyodb',
-    password: '',
-    port: 5432
-};
 
 
 export const getContacts = (req, res) => {
@@ -18,7 +21,7 @@ export const getContacts = (req, res) => {
         sqlQuery = 'SELECT * FROM custom_functional_message_module_contacts';
     }
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)
@@ -43,7 +46,7 @@ export const getContactWithID = (req, res) => {
     let sqlQuery = `SELECT * FROM custom_functional_message_module_contacts where id='${req.params.contactId}'`;
     let values = [];
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)
@@ -64,13 +67,57 @@ export const getContactWithID = (req, res) => {
 }
 
 
+export const getContactWithTagID = async (req, res) => {
+
+    const client = new Client(global.gConfig.connectionProps)
+    client.connect()
+
+    let sqlQuery = '';
+    let SQLresult = {};
+    var tag_code;
+    var campaign_id;
+    var defaultLeadId;
+    let CustomerData = [];
+
+    try {
+
+        let dataTableName = await getDataTableName(campaign_id);
+        let sqlQuery = `select tag, phone1, segment, cif_no from ${dataTableName} where tag % ${tag_code} = 0`;
+        SQLresult = await client.query(sqlQuery);
+        console.log('---> SQL Query : ');
+        console.log(sqlQuery);
+        console.log('---> SQL Result : ');
+        console.log(SQLresult.rows);
+        for (let i = 0; i < SQLresult.rows.length; i++) {
+            let contact = {};
+            contact['phone1'] = SQLresult.rows[i].phone1;
+            contact['segment'] = SQLresult.rows[i].segment;
+            contact['cif_no'] = SQLresult.rows[i].cif_no;
+            CustomerData.push(contact);
+        }
+        console.log("===> CustomerData : ");
+        console.log(CustomerData);
+
+    } catch (e) {
+        console.error(e.stack)
+    }
+
+    res.json({
+        msg: "Success",
+        data: response.data
+    });
+
+}
+
+
+
 export const addNewContact = async (req, res) => {
 
     let body = req.body;
     let addedCounter = 0;
     let failedToAddCounter = 0;
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
     client.connect();
 
     for (let i = 0; i < body.length; i++) {
@@ -108,7 +155,7 @@ export const deleteContact = (req, res) => {
     let sqlQuery = `DELETE FROM custom_functional_message_module_contacts where id='${req.params.contactId}'`;
     let values = [];
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)

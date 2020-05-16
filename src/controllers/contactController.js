@@ -21,7 +21,7 @@ export const getContacts = (req, res) => {
         sqlQuery = 'SELECT * FROM custom_functional_message_module_contacts';
     }
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)
@@ -46,7 +46,7 @@ export const getContactWithID = (req, res) => {
     let sqlQuery = `SELECT * FROM custom_functional_message_module_contacts where id='${req.params.contactId}'`;
     let values = [];
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)
@@ -117,7 +117,7 @@ export const addNewContact = async (req, res) => {
     let addedCounter = 0;
     let failedToAddCounter = 0;
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
     client.connect();
 
     for (let i = 0; i < body.length; i++) {
@@ -155,7 +155,7 @@ export const deleteContact = (req, res) => {
     let sqlQuery = `DELETE FROM custom_functional_message_module_contacts where id='${req.params.contactId}'`;
     let values = [];
 
-    const client = new Client(connectionProps)
+    const client = new Client(global.gConfig.connectionProps)
 
     client.connect()
     client.query(sqlQuery, values)
